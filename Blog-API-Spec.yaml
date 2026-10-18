@@ -1,0 +1,233 @@
+openapi: 3.0.3
+info:
+  title: Blog Posts API
+  version: "1.0"
+  description: Simple Blog Posts API.
+servers:
+  - url: http://localhost:3000
+    description: Local Test Server
+paths:
+  /posts:
+    get:
+      tags: [posts]
+      summary: Alle Beiträge abrufen
+      parameters:
+        - name: _page
+          in: query
+          description: Page number to retrieve when paginating results (default 1).
+          schema:
+            type: integer
+            minimum: 1
+        - name: _per_page
+          in: query
+          description: Number of items per page when paginating results (default 10).
+          schema:
+            type: integer
+            minimum: 1
+        - name: _sort
+          in: query
+          description: Comma-separated list of fields to sort by; prefix a field with '-' to sort descending.
+          schema:
+            type: string
+        - name: _embed
+          in: query
+          description: Include related resources, e.g. `_embed=comments`; repeat to embed multiple relations.
+          style: form
+          explode: true
+          schema:
+            type: array
+            items:
+              type: string
+      responses:
+        "200":
+          description: "Success"
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Post'
+    post:
+      tags: [posts]
+      summary: Neuen Beitrag erstellen
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Post'
+      responses:
+        "201":
+          description: "Success"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Post'
+  /posts/{id}:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+    get:
+      tags: [posts]
+      summary: Beitrag abrufen
+      responses:
+        "200":
+          description: "Success"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Post'
+        "404":
+          description: "Not found"
+    put:
+      tags: [posts]
+      summary: Beitrag aktualisieren
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Post'
+      responses:
+        "200":
+          description: "Success"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Post'
+        "404":
+          description: "Not found"
+    delete:
+      tags: [posts]
+      summary: Beitrag löschen
+      parameters:
+        - name: _dependent
+          in: query
+          description: Delete related resources, e.g. `_dependent=comments`; repeat to delete multiple relations.
+          style: form
+          explode: true
+          schema:
+            type: array
+            items:
+              type: string
+      responses:
+        "200":
+          description: "Deleted successfully"
+        "404":
+          description: "Not found"
+  /comments:
+    get:
+      tags: [comments]
+      summary: Alle Kommentare abrufen
+      responses:
+        "200":
+          description: "Success"
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Comment'
+    post:
+      tags: [comments]
+      summary: Neuen Kommentar erstellen
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Comment'
+      responses:
+        "201":
+          description: "Success"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Comment'
+  /comments/{id}:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+    get:
+      tags: [comments]
+      summary: Kommentar abrufen
+      responses:
+        "200":
+          description: "Success"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Comment'
+        "404":
+          description: "Not found"
+    put:
+      tags: [comments]
+      summary: Kommentar aktualisieren
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Comment'
+      responses:
+        "200":
+          description: "Success"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Comment'
+        "404":
+          description: "Not found"
+    delete:
+      tags: [comments]
+      summary: Kommentar löschen
+      responses:
+        "204":
+          description: "Deleted successfully"
+        "404":
+          description: "Not found"
+components:
+  schemas:
+    Post:
+      type: object
+      properties:
+        id:
+          type: string
+          example: "123"
+        title:
+          type: string
+          example: "My first blog entry"
+        text:
+          type: string
+          example: "This is my first blog entry"
+        views:
+          type: integer
+          example: 42
+        isActive:
+          type: boolean
+          example: true
+      required:
+        - title
+        - text
+        - id
+    Comment:
+      type: object
+      properties:
+        id:
+          type: string
+          example: "1"
+        text:
+          type: string
+          example: "a comment about post 1"
+        postId:
+          type: string
+          example: "1"
+      required:
+        - text
+        - postId
